@@ -136,3 +136,6 @@ models/*
 
 #config file has sensitive data
 .mlflow_uri
+
+# file that osx creates
+.DS_Store
