@@ -148,7 +148,7 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
                           nan_removed=True, zero_removed=False, mean=None, 
                           hyperparameter=model.get_params(), model_parameters=None, scaler=scaler, info=infotext_mlflow)
             
-    return trainscore, testscore, model
+    return trainscore, testscore, model_dict
 
 
 def get_features(data):
