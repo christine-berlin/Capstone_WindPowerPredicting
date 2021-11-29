@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error
 import warnings
 import mlflow
+from copy import deepcopy
 
 from modeling.config import EXPERIMENT_NAME
 TRACKING_URI = open("../.mlflow_uri").read().strip()
@@ -72,7 +73,7 @@ def log_to_mlflow(
 
 
 ## function for modelling
-def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, infotext_mlflow=None):
+def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, infotext_mlflow=None, save_models = False):
 
     zones = np.sort(data_train.ZONEID.unique())
 
@@ -80,7 +81,7 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
     y_trainpred, y_testpred = pd.DataFrame(), pd.DataFrame()
 
     # save scores of linear regression models for different zones in dictionary
-    trainscore, testscore = {}, {}
+    trainscore, testscore, model_dict = {}, {}, {}
 
     # loop over zones
     for zone in zones:
@@ -109,6 +110,9 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
 
         # train model
         model.fit(X_train, y_train)
+        
+        if save_models:
+            model_dict[zone] = deepcopy(model)
 
         # predict train data with the model and calculate train-score
         y_pred = model.predict(X_train)
@@ -144,7 +148,7 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
                           nan_removed=True, zero_removed=False, mean=None, 
                           hyperparameter=model.get_params(), model_parameters=None, scaler=scaler, info=infotext_mlflow)
             
-    return trainscore, testscore
+    return trainscore, testscore, model_dict
 
 
 def get_features(data):
@@ -173,3 +177,6 @@ def get_features(data):
     feature_dict['no_deg_comp_ten'] = [var for var in feature_dict['no_deg_comp'] if var in feature_dict['no_ten']]
 
     return feature_dict
+
+
+
