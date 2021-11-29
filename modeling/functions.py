@@ -44,7 +44,7 @@ def log_to_mlflow(
             
     mlflow.start_run()
     run = mlflow.active_run()
-    print("Active run_id: {}".format(run.info.run_id))
+    print("\nActive run_id: {}".format(run.info.run_id))
 
     if ZONEID:
         mlflow.set_tag("ZONEID", ZONEID)
@@ -99,13 +99,13 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
 
             if scaler.__class__.__name__ == "MinMaxScaler":
                 print(f'Scaler: MinMaxScaler')
-                print(f'Scaled X_train min/max: {X_train.min()}, {X_train.max()}')
-                print(f'Scaled X_test min/max: {X_test.min()}, {X_test.max()}\n')
+                print(f'Scaled X_train min/max: {round(X_train.min(),2)}, {round(X_train.max(),2)}')
+                print(f'Scaled X_test min/max: {round(X_test.min(),2)}, {round(X_test.max(),2)}\n')
 
             if scaler.__class__.__name__ == "StandardScaler":
                 print(f'Scaler: StandardScaler')
-                print(f'Scaled X_train mean/std: {X_train.mean()}, {X_train.std()}')
-                print(f'Scaled X_test mean/std: {X_test.mean()}, {X_test.std()}\n')
+                print(f'Scaled X_train mean/std: {round(X_train.mean(),2)}, {round(X_train.std(),2)}')
+                print(f'Scaled X_test mean/std: {round(X_test.mean(),2)}, {round(X_test.std(),2)}\n')
 
         # train model
         model.fit(X_train, y_train)
@@ -147,3 +147,29 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
     return trainscore, testscore
 
 
+def get_features(data):
+    features = data.columns.to_list()
+    features = [var for var in features if var not in ('ZONEID','TARGETVAR','TIMESTAMP')]
+
+    feature_dict = {}
+
+    feature_dict['all'] = features
+    feature_dict['no_deg'] = [var for var in features if var not in ('WD100','WD10')]
+    feature_dict['no_deg_norm'] = [var for var in features if var not in ('WD100','WD10','U100NORM','V100NORM')]
+    feature_dict['no_deg_norm_U10V10'] = [var for var in features if var not in ('WD100','WD10','U100NORM','V100NORM','U10','V10')]
+    feature_dict['no_deg_norm_WS10'] = [var for var in features if var not in ('WD100','WD10','U100NORM','V100NORM','WS10')]
+
+
+
+    
+    feature_dict['no_comp'] = [var for var in features if var not in ('U10','U100','U100NORM','V10','V100','V100NORM')]
+    feature_dict['no_comp_plus_100Norm'] = [var for var in features if var not in ('U10','U100','V10','V100')]
+
+    feature_dict['no_deg_comp'] = [var for var in features if var in feature_dict['no_deg'] and var in feature_dict['no_comp']]
+
+    feature_dict['no_ten'] = [var for var in features if 'WD10CARD' not in var and var not in ('U10','V10','WS10')]
+    feature_dict['no_card'] = [var for var in features if 'CARD' not in var]
+
+    feature_dict['no_deg_comp_ten'] = [var for var in feature_dict['no_deg_comp'] if var in feature_dict['no_ten']]
+
+    return feature_dict
