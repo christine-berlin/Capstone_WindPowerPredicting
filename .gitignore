@@ -139,3 +139,8 @@ models/*
 
 # file that osx creates
 .DS_Store
+
+# folder with saved models
+saved_models
+
+
