@@ -7,6 +7,10 @@ from sklearn.base import clone
 import warnings
 import mlflow
 from copy import deepcopy
+from datetime import datetime
+import pickle
+import os
+
 
 from modeling.config import EXPERIMENT_NAME
 TRACKING_URI = open("../.mlflow_uri").read().strip()
@@ -75,7 +79,7 @@ def log_to_mlflow(
 
 
 ## function for modelling
-def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, infotext_mlflow=None, save_models = False, perform_gridCV = False, param_grid = None):
+def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, infotext_mlflow=None, save_model = False, perform_gridCV = False, param_grid = None):
     # get zones in data
     zones = np.sort(data_train.ZONEID.unique())
 
@@ -108,7 +112,7 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
             model_clone.fit(X_train, y_train)
         
 
-        if save_models:
+        if save_model:
             model_dict[zone] = deepcopy(model_clone)
 
         # predict train data with the model_clone and calculate train-score
@@ -145,7 +149,8 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
                           hyperparameter=model.get_params(), model_parameters=None, scaler=scaler, info=infotext_mlflow)
 
 
-    if save_models:
+    if save_model:
+        save_models(model_dict)
         return trainscore, testscore, model_dict
     else:
         return trainscore, testscore
@@ -204,6 +209,57 @@ def get_features(data):
     feature_dict['no_deg_comp_ten'] = [var for var in feature_dict['no_deg_comp'] if var in feature_dict['no_ten']]
 
     return feature_dict
+
+def save_models(model_dict,model_name=None):
+    '''
+    Save models from model_dict.
+    '''
+    if model_name:
+        pass
+    else:
+        k1 = list(model_dict)[0]
+        k2 = list(model_dict[k1])[0]
+        model_name = model_dict[k1][k2].__class__.__name__
+    time = datetime.now().strftime("%y%m%d_%H%M")
+
+    dir1 = time+'_'+model_name
+    path = '../saved_models/'+dir1
+    os.mkdir(path)
+    for feat in model_dict.keys():
+        dir2 = path+'/'+feat
+        os.mkdir(dir2)
+        for zone,model in model_dict[feat].items():
+            filename = 'zone_'+str(zone).zfill(2)+'.pickle'
+            outfile = open(dir2+'/'+filename, 'wb')
+            pickle.dump(model, outfile)
+            outfile.close()
+    return path
+
+
+def load_models(parent_dir):
+    '''
+    Load models from given parent_dir and return them as a model dictionary.
+    '''
+    model_dict = {}
+    path = '../saved_models/'+parent_dir
+    for feat in os.listdir(path):
+        model_dict[feat] = {}
+        for zone in os.listdir(path+'/'+feat):
+            filename = path+'/'+feat+'/'+zone
+            infile = open(filename,'rb')
+            loaded = pickle.load(infile)
+            infile.close()
+            model_dict[feat][int(zone.split('.')[0][-2:])] = loaded 
+    return model_dict
+
+
+
+
+    
+
+
+
+
 
 
 
