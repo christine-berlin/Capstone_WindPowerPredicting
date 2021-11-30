@@ -139,7 +139,7 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
     # print scores if desired
     if print_scores:
         for key in testscore.keys():
-            print(f'train-RMSE/test-RMSE linear regression model for {key}: {round(trainscore[key],3)} {round(testscore[key],3)}')
+            print(f'train-RMSE/test-RMSE linear regression model for {key}: {round(trainscore[key],3)} {round(testscore[key],3)}\n')
 
     # track to MLFLow
     if log:
@@ -168,6 +168,7 @@ def get_features(data):
     feature_dict['no_deg_comp'] = [var for var in features if var in feature_dict['no_deg'] and var in feature_dict['no_comp']]
     feature_dict['no_ten'] = [var for var in features if 'WD10CARD' not in var and var not in ('U10','V10','WS10','WD10')]
     feature_dict['no_card'] = [var for var in features if 'CARD' not in var]
+    feature_dict['no_card_ten'] = [var for var in feature_dict['no_card'] if var in feature_dict['no_ten']]
     feature_dict['no_deg_comp_ten'] = [var for var in feature_dict['no_deg_comp'] if var in feature_dict['no_ten']]
 
     return feature_dict
