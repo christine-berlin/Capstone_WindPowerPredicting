@@ -205,6 +205,7 @@ def get_features(data):
     feature_dict['no_deg_comp'] = [var for var in features if var in feature_dict['no_deg'] and var in feature_dict['no_comp']]
     feature_dict['no_ten'] = [var for var in features if 'WD10CARD' not in var and var not in ('U10','V10','WS10','WD10')]
     feature_dict['no_card'] = [var for var in features if 'CARD' not in var]
+    feature_dict['no_card_100Norm'] = [var for var in features if 'CARD' not in var and var not in ('U100NORM','V100NORM')]
     feature_dict['no_card_ten'] = [var for var in feature_dict['no_card'] if var in feature_dict['no_ten']]
     feature_dict['no_deg_comp_ten'] = [var for var in feature_dict['no_deg_comp'] if var in feature_dict['no_ten']]
 
