@@ -79,7 +79,7 @@ def log_to_mlflow(
 
 
 ## function for modelling
-def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, infotext_mlflow=None, save_model = False, perform_gridCV = False, param_grid = None):
+def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, infotext_mlflow=None, save_model = False, perform_gridCV = False, param_grid = None, n_jobs = -1):
     # get zones in data
     zones = np.sort(data_train.ZONEID.unique())
 
@@ -103,9 +103,9 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
         if perform_gridCV:
             if param_grid:
                 print(f'ZONEID {zone}')
-                cv = GridSearchCV(model_clone, param_grid= param_grid, scoring = 'neg_root_mean_squared_error', refit=True, n_jobs=-1, verbose=2)
+                cv = GridSearchCV(model_clone, param_grid= param_grid, scoring = 'neg_root_mean_squared_error', refit=True, n_jobs=n_jobs, verbose=2)
                 cv.fit(X_train,y_train)
-                model_clone = cv
+                model_clone = cv.best_estimator_
             else:
                 raise ValueError('No parameter grid given for Grid Search')
         else:
@@ -150,7 +150,6 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
 
 
     if save_model:
-        save_models(model_dict)
         return trainscore, testscore, model_dict
     else:
         return trainscore, testscore
@@ -211,7 +210,7 @@ def get_features(data):
 
     return feature_dict
 
-def save_models(model_dict,model_name=None):
+def save_models(model_dict, model_name = None, results_train = None, results_test = None):
     '''
     Save models from model_dict.
     '''
@@ -226,6 +225,10 @@ def save_models(model_dict,model_name=None):
     dir1 = time+'_'+model_name
     path = '../saved_models/'+dir1
     os.mkdir(path)
+
+    if results_train and results_test:
+        save_results(results_train, results_test, path)
+
     for feat in model_dict.keys():
         dir2 = path+'/'+feat
         os.mkdir(dir2)
@@ -254,7 +257,22 @@ def load_models(parent_dir):
     return model_dict
 
 
+def save_results(results_train, results_test, path):
+    features = []
+    zones = []
+    train_score = []
+    test_score = []
 
+    for key in results_train.keys():
+        for zone in results_train[key].keys():
+            features.append(key)
+            zones.append(zone)
+            train_score.append(results_train[key][zone])
+            test_score.append(results_test[key][zone])
+
+    df = pd.DataFrame({'features':features,'zone': zones,'train_score': train_score,'test_score': test_score})
+    file_name = path.split('/')[-1] + '.csv'
+    df.to_csv(path + '/' + file_name, index=False)
 
     
 
