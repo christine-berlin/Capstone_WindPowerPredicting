@@ -139,7 +139,7 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
     # print scores if desired
     if print_scores:
         for key in testscore.keys():
-            print(f'train-RMSE/test-RMSE linear regression model for {key}: {round(trainscore[key],3)} {round(testscore[key],3)}\n')
+            print(f'train-RMSE/test-RMSE {model.__class__.__name__} for {key}: {round(trainscore[key],3)} {round(testscore[key],3)}\n')
 
     # track to MLFLow
     if log:
