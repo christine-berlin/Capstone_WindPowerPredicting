@@ -155,6 +155,46 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
         return trainscore, testscore
 
 
+## baseline model for every zone and aggregated over all zones
+def baseline(train, test):
+
+    ''' baseline model for every zone and aggregated over all zones'''
+
+    # zones to loop over
+    zones = np.sort(train.ZONEID.unique()) 
+
+    # baseline predictions of all sites will be merged into one DataFrame to calculate the RMSE with respect to the observations of all zones
+    finalpred = pd.DataFrame() 
+
+    # scores of zone-dependent baseline models are saved in dictionary
+    score = {}
+
+    # loop over all zones
+    for zone in zones:
+
+    # get train and test data of individual zones
+        ytrain = train[train.ZONEID == zone].TARGETVAR
+        ytest =  test[test.ZONEID == zone].TARGETVAR
+
+        # baseline predicton for individual zone
+        pred = np.ones(len(ytest)) * np.mean(ytrain)
+
+        # RMSE for current zone
+        score['ZONE' + str(zone)] = mean_squared_error(ytest, pred, squared=False)
+
+        # add y_pred to DataFrame y_finalpred
+        pred = pd.DataFrame(pred, index = ytest.index, columns = ['pred'])
+        finalpred = pd.concat([finalpred, pred], axis=0)
+
+    # merge final baseline predictions with observations of all zones to ensure a right order in both data  
+    finalpred = finalpred.join(test.TARGETVAR)
+    finalpred.rename(columns = {'TARGETVAR':'test'}, inplace=True)
+
+    # RMSE for whole dataset
+    score['TOTAL'] = mean_squared_error(finalpred['test'], finalpred['pred'], squared=False)
+    return score
+
+
 def scaler_func(X_train, X_test, scaler):
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
