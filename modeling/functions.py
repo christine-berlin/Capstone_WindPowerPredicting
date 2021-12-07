@@ -289,11 +289,14 @@ def load_models(parent_dir):
     for feat in os.listdir(path):
         model_dict[feat] = {}
         for zone in os.listdir(path+'/'+feat):
-            filename = path+'/'+feat+'/'+zone
-            infile = open(filename,'rb')
-            loaded = pickle.load(infile)
-            infile.close()
-            model_dict[feat][int(zone.split('.')[0][-2:])] = loaded 
+            if len(zone.split('.'))>1:
+                pass
+            else:
+                filename = path+'/'+feat+'/'+zone
+                infile = open(filename,'rb')
+                loaded = pickle.load(infile)
+                infile.close()
+                model_dict[feat][int(zone.split('.')[0][-2:])] = loaded 
     return model_dict
 
 
