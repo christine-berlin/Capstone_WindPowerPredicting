@@ -79,7 +79,9 @@ def log_to_mlflow(
 
 
 ## function for modelling
-def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, infotext_mlflow=None, save_model = False, perform_gridCV = False, param_grid = None, n_jobs = -1):
+def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, \
+                infotext_mlflow=None, save_model = False, perform_gridCV = False, param_grid = None, \
+                    zone_params = None, n_jobs = -1):
     # get zones in data
     zones = np.sort(data_train.ZONEID.unique())
 
@@ -96,6 +98,9 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
         model_clone = clone(model)
         # split train and test data in feature and TARGETVAR parts and cut data to desired zones
         X_train, X_test, y_train, y_test = train_test_feat(data_train, data_test, zone, features)
+        if zone_params:
+            model_clone.set_params(**zone_params[zone])
+            perform_gridCV = False
 
         # scale data if scaler is not None
         if scaler:
@@ -105,7 +110,8 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
         if perform_gridCV:
             if param_grid:
                 print(f'ZONEID {zone}')
-                cv = GridSearchCV(model_clone, param_grid= param_grid, scoring = 'neg_root_mean_squared_error', refit=True, n_jobs=n_jobs, verbose=2)
+                cv = GridSearchCV(model_clone, param_grid= param_grid, scoring = 'neg_root_mean_squared_error', \
+                                  refit=True, n_jobs=n_jobs, verbose=2)
                 cv.fit(X_train,y_train)
                 model_clone = cv.best_estimator_
             else:
@@ -160,6 +166,36 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
     else:
         return trainscore, testscore
 
+
+def modelling_fc(data_train, data_test, feature_dict, model, scaler=None, print_scores=True, log=None, \
+                infotext_mlflow=None, save_model = False, perform_gridCV = False, param_grid = None, \
+                    zone_params = None, n_jobs = -1):
+
+    df_results = pd.DataFrame()
+
+    for fc in feature_dict.keys():
+        features = feature_dict[fc]
+        trainscore, testscore, model_dict = modelling(data_train, data_test, features, model, scaler, print_scores, log, \
+                                                        infotext_mlflow, save_model, perform_gridCV, param_grid, \
+                                                        zone_params, n_jobs)
+
+        df_results_fc = result_to_df(model_dict, testscore, trainscore, fc)
+        df_results = pd.concat([df_results, df_results_fc], axis = 0)
+
+    return df_results
+
+def result_to_df(model_dict, testscore, trainscore, fc): 
+    df_results = pd.DataFrame.from_dict(model_dict, orient= 'index', columns = ['MODEL'])
+    df_results['BEST_PARAMS'] = df_results.MODEL.apply(lambda x: x.get_params())
+    df_results['MODEL'] = df_results.MODEL.apply(lambda x: x.__class__.__name__)
+    df_results['ZONE'] = df_results.index
+    df_results.ZONE = df_results.ZONE.apply(lambda x: f'ZONE{x}')
+    df_results = df_results.set_index('ZONE')
+    df_results['FC'] = fc
+    df_results = df_results.join(pd.DataFrame.from_dict(testscore, orient= 'index', columns = ['TESTSCORE']), how = 'right')
+    df_results = df_results.join(pd.DataFrame.from_dict(trainscore, orient= 'index', columns = ['TRAINSCORE']), how = 'right')
+    df_results['MODEL'].fillna(method='ffill', inplace = True)
+    return df_results
 
 ## baseline model for every zone and aggregated over all zones
 def baseline(train, test):
@@ -242,17 +278,11 @@ def get_features(data):
     feature_dict['all'] = features
     feature_dict['no_deg'] = [var for var in features if var not in ('WD100','WD10')]
     feature_dict['no_deg_norm'] = [var for var in features if var not in ('WD100','WD10','U100NORM','V100NORM')]
-    feature_dict['no_deg_norm_U10V10'] = [var for var in features if var not in ('WD100','WD10','U100NORM','V100NORM','U10','V10')]
-    feature_dict['no_deg_norm_WS10'] = [var for var in features if var not in ('WD100','WD10','U100NORM','V100NORM','WS10')]
-
     feature_dict['no_comp'] = [var for var in features if var not in ('U10','U100','U100NORM','V10','V100','V100NORM')]
     feature_dict['no_comp_plus_100Norm'] = [var for var in features if var not in ('U10','U100','V10','V100')]
-    feature_dict['no_deg_comp'] = [var for var in features if var in feature_dict['no_deg'] and var in feature_dict['no_comp']]
     feature_dict['no_ten'] = [var for var in features if 'WD10CARD' not in var and var not in ('U10','V10','WS10','WD10')]
     feature_dict['no_card'] = [var for var in features if 'CARD' not in var]
     feature_dict['no_card_100Norm'] = [var for var in features if 'CARD' not in var and var not in ('U100NORM','V100NORM')]
-    feature_dict['no_card_ten'] = [var for var in feature_dict['no_card'] if var in feature_dict['no_ten']]
-    feature_dict['no_deg_comp_ten'] = [var for var in feature_dict['no_deg_comp'] if var in feature_dict['no_ten']]
 
     return feature_dict
 
