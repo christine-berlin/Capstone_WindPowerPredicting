@@ -89,6 +89,8 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
     # save scores of linear regression models for different zones in dictionary
     trainscore, testscore, model_dict = {}, {}, {}
 
+    mse_train = 0
+    mse_test = 0
     # loop over zones
     for zone in zones:
         model_clone = clone(model)
@@ -119,22 +121,26 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
         y_pred = predict_func(model_clone, X_train, y_train)
         y_trainpred = pd.concat([y_trainpred, y_pred], axis=0)
         trainscore['ZONE' + str(zone)] = mean_squared_error(y_pred, y_train, squared=False)
+        
+        mse_train += np.power(trainscore['ZONE' + str(zone)], 2) * 1 / len(zones)
 
         # predict test data with the model_clone and calculate test-score
         y_pred = predict_func(model_clone, X_test, y_test)
         y_testpred = pd.concat([y_testpred, y_pred], axis=0)
         testscore['ZONE' + str(zone)] = mean_squared_error(y_pred, y_test, squared=False)
 
+        mse_test += np.power(testscore['ZONE' + str(zone)], 2) * 1 / len(zones)
     # merge final train and test predictions with observations to ensure a right order in both data  
-    y_trainpred = y_trainpred.join(data_train.TARGETVAR)
-    y_trainpred.rename(columns = {'TARGETVAR':'test'}, inplace=True)
-    trainscore['TOTAL'] = mean_squared_error(y_trainpred['test'], y_trainpred['pred'], squared=False)
+    # y_trainpred = y_trainpred.join(data_train.TARGETVAR)
+    # y_trainpred.rename(columns = {'TARGETVAR':'test'}, inplace=True)
+    # trainscore['TOTAL'] = mean_squared_error(y_trainpred['test'], y_trainpred['pred'], squared=False)
+    trainscore['TOTAL'] = np.power(mse_train, 0.5)
 
+    # y_testpred = y_testpred.join(data_test.TARGETVAR)
+    # y_testpred.rename(columns = {'TARGETVAR':'test'}, inplace=True)
+    # testscore['TOTAL'] = mean_squared_error(y_testpred['test'], y_testpred['pred'], squared=False)
 
-    y_testpred = y_testpred.join(data_test.TARGETVAR)
-    y_testpred.rename(columns = {'TARGETVAR':'test'}, inplace=True)
-    testscore['TOTAL'] = mean_squared_error(y_testpred['test'], y_testpred['pred'], squared=False)
-
+    testscore['TOTAL'] = np.power(mse_test, 0.5)
 
     # print scores if desired
     if print_scores:
