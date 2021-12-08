@@ -80,7 +80,7 @@ def log_to_mlflow(
 
 ## function for modelling
 def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, \
-                infotext_mlflow=None, save_model = False, perform_gridCV = False, param_grid = None, \
+                infotext_mlflow=None, save_model = True, perform_gridCV = True, param_grid = None, \
                     zone_params = None, n_jobs = -1):
     # get zones in data
     zones = np.sort(data_train.ZONEID.unique())
@@ -113,14 +113,12 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
                 cv = GridSearchCV(model_clone, param_grid= param_grid, scoring = 'neg_root_mean_squared_error', \
                                   refit=True, n_jobs=n_jobs, verbose=2)
                 cv.fit(X_train,y_train)
+                cv_score[zone] = np.abs(cv.best_score_)
                 model_clone = cv.best_estimator_
             else:
                 raise ValueError('No parameter grid given for Grid Search')
         else:
             model_clone.fit(X_train, y_train)
-
-        cv_temp = np.abs(cross_val_score(model_clone, X_train, y_train, cv=5, scoring='neg_root_mean_squared_error', n_jobs=n_jobs))
-        cv_score[zone] = np.percentile(cv_temp,95)
         
         if save_model:
             model_dict[zone] = deepcopy(model_clone)
@@ -138,16 +136,8 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
         testscore['ZONE' + str(zone)] = mean_squared_error(y_pred, y_test, squared=False)
 
         mse_test += np.power(testscore['ZONE' + str(zone)], 2) * len(y_test)/len(data_test) #1 / len(zones)
-    # merge final train and test predictions with observations to ensure a right order in both data  
-    # y_trainpred = y_trainpred.join(data_train.TARGETVAR)
-    # y_trainpred.rename(columns = {'TARGETVAR':'test'}, inplace=True)
-    # trainscore['TOTAL'] = mean_squared_error(y_trainpred['test'], y_trainpred['pred'], squared=False)
+    
     trainscore['TOTAL'] = np.power(mse_train, 0.5)
-
-    # y_testpred = y_testpred.join(data_test.TARGETVAR)
-    # y_testpred.rename(columns = {'TARGETVAR':'test'}, inplace=True)
-    # testscore['TOTAL'] = mean_squared_error(y_testpred['test'], y_testpred['pred'], squared=False)
-
     testscore['TOTAL'] = np.power(mse_test, 0.5)
 
     # print scores if desired
@@ -178,7 +168,7 @@ def get_bestfeatures(df):
     for zone in df.index.unique():
         df_zone = df.loc[zone]
 
-        df_results = pd.concat([df_results, df_zone[df_zone.CV_P95 == df_zone.CV_P95.min()]])
+        df_results = pd.concat([df_results, df_zone[df_zone.CV == df_zone.CV.min()]])
 
     return df_results
 
@@ -206,7 +196,7 @@ def modelling_fc(data_train, data_test, feature_dict, model, scaler=None, print_
 def result_to_df(model_dict, testscore, trainscore, cv_score, fc): 
     df_results = pd.DataFrame(pd.Series([model_dict[i].get_params() for i in range(1,11)]), \
                              columns = ['BEST_PARAMS'])
-    df_results['CV_P95'] = pd.Series([cv_score[i] for i in range(1,11)])
+    df_results['CV'] = pd.Series([cv_score[i] for i in range(1,11)])
     df_results['ZONE'] = df_results.index
     df_results.ZONE = df_results.ZONE.apply(lambda x: f'ZONE{x+1}')
     df_results = df_results.set_index('ZONE')
