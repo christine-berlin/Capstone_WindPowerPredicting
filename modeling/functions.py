@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.base import clone
 import warnings
 import mlflow
@@ -89,7 +89,7 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
     y_trainpred, y_testpred = pd.DataFrame(), pd.DataFrame()
 
     # save scores of linear regression models for different zones in dictionary
-    trainscore, testscore, model_dict = {}, {}, {}
+    trainscore, testscore, model_dict, cv_score = {}, {}, {}, {}
 
     mse_train = 0
     mse_test = 0
@@ -118,8 +118,10 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
                 raise ValueError('No parameter grid given for Grid Search')
         else:
             model_clone.fit(X_train, y_train)
-        
 
+        cv_temp = np.abs(cross_val_score(model_clone, X_train, y_train, cv=5, scoring='neg_root_mean_squared_error', n_jobs=n_jobs))
+        cv_score[zone] = np.percentile(cv_temp,95)
+        
         if save_model:
             model_dict[zone] = deepcopy(model_clone)
 
@@ -162,9 +164,24 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
 
 
     if save_model:
-        return trainscore, testscore, model_dict
+        return trainscore, testscore, model_dict, cv_score
     else:
-        return trainscore, testscore
+        return trainscore, testscore, cv_score
+
+def get_bestfeatures(df):
+
+    ''' df: contains test/train-score for one model, 10 zones and all feature combinations
+        df_results: test/train-score for one model, 10 zones for best feature combination '''
+
+    df_results = pd.DataFrame()
+
+    for zone in df.index.unique():
+        df_zone = df.loc[zone]
+
+        df_results = pd.concat([df_results, df_zone[df_zone.CV_P95 == df_zone.CV_P95.min()]])
+
+    return df_results
+
 
 
 def modelling_fc(data_train, data_test, feature_dict, model, scaler=None, print_scores=True, log=None, \
@@ -175,26 +192,28 @@ def modelling_fc(data_train, data_test, feature_dict, model, scaler=None, print_
 
     for fc in feature_dict.keys():
         features = feature_dict[fc]
-        trainscore, testscore, model_dict = modelling(data_train, data_test, features, model, scaler, print_scores, log, \
+        trainscore, testscore, model_dict, cv_score = modelling(data_train, data_test, features, model, scaler, print_scores, log, \
                                                         infotext_mlflow, save_model, perform_gridCV, param_grid, \
                                                         zone_params, n_jobs)
 
-        df_results_fc = result_to_df(model_dict, testscore, trainscore, fc)
+        df_results_fc = result_to_df(model_dict, testscore, trainscore, cv_score, fc)
         df_results = pd.concat([df_results, df_results_fc], axis = 0)
+
+    df_results = get_bestfeatures(df_results)
 
     return df_results
 
-def result_to_df(model_dict, testscore, trainscore, fc): 
-    df_results = pd.DataFrame.from_dict(model_dict, orient= 'index', columns = ['MODEL'])
-    df_results['BEST_PARAMS'] = df_results.MODEL.apply(lambda x: x.get_params())
-    df_results['MODEL'] = df_results.MODEL.apply(lambda x: x.__class__.__name__)
+def result_to_df(model_dict, testscore, trainscore, cv_score, fc): 
+    df_results = pd.DataFrame(pd.Series([model_dict[i].get_params() for i in range(1,11)]), \
+                             columns = ['BEST_PARAMS'])
+    df_results['CV_P95'] = pd.Series([cv_score[i] for i in range(1,11)])
     df_results['ZONE'] = df_results.index
-    df_results.ZONE = df_results.ZONE.apply(lambda x: f'ZONE{x}')
+    df_results.ZONE = df_results.ZONE.apply(lambda x: f'ZONE{x+1}')
     df_results = df_results.set_index('ZONE')
+    df_results['MODEL'] = model_dict[1].__class__.__name__
     df_results['FC'] = fc
-    df_results = df_results.join(pd.DataFrame.from_dict(testscore, orient= 'index', columns = ['TESTSCORE']), how = 'right')
-    df_results = df_results.join(pd.DataFrame.from_dict(trainscore, orient= 'index', columns = ['TRAINSCORE']), how = 'right')
-    df_results['MODEL'].fillna(method='ffill', inplace = True)
+    df_results = df_results.join(pd.DataFrame.from_dict(testscore, orient= 'index', columns = ['TESTSCORE'])) # leave out TOTAL
+    df_results = df_results.join(pd.DataFrame.from_dict(trainscore, orient= 'index', columns = ['TRAINSCORE']))
     return df_results
 
 ## baseline model for every zone and aggregated over all zones
