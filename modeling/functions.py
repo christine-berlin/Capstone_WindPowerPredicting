@@ -175,12 +175,16 @@ def get_bestfeatures(df):
 
 
 def modelling_fc(data_train, data_test, feature_dict, model, scaler=None, print_scores=True, log=None, \
-                infotext_mlflow=None, save_model = False, perform_gridCV = False, param_grid = None, \
+                infotext_mlflow=None, save_model = True, perform_gridCV = True, param_grid = None, \
                     zone_params = None, n_jobs = -1):
+
+    nfits = len(data_train.ZONEID.unique()) * len(feature_dict.keys()) * np.prod([len(x) for x in param_grid.values()]) * 5
+    print(f'Total number of fits: {nfits}')
 
     df_results = pd.DataFrame()
 
     for fc in feature_dict.keys():
+        print(f'feature combination: {fc}\n')
         features = feature_dict[fc]
         trainscore, testscore, model_dict, cv_score = modelling(data_train, data_test, features, model, scaler, print_scores, log, \
                                                         infotext_mlflow, save_model, perform_gridCV, param_grid, \
