@@ -31,16 +31,10 @@ server = app.server
 ################################################################################
 # PLOTS
 ################################################################################
-LEGEND = ["clicks", "go fish!"]
-SCORES = [0.1, 0.1]
 
-
-def get_figure(legend, scores):
-    return go.Figure(
-        [go.Bar(x=legend, y=scores)],
-        layout=go.Layout(template="simple_white"),
-    )
-fig = get_figure(LEGEND, SCORES)
+## get color scheme right
+colors = px.colors.qualitative.Plotly
+color_dict = {'Zone '+str(z): c for z,c in zip(range(1,11), colors)}
 
 def get_figure_24h(dff, selected_columns):
     tmin, tmax = 0,24
@@ -51,7 +45,9 @@ def get_figure_24h(dff, selected_columns):
 
     colors = px.colors.qualitative.Plotly
     fig = go.Figure()
-    for column, color in zip(selected_columns, colors):
+    selected_columns = sorted(selected_columns, key=lambda x : x[-2:])
+    for column in selected_columns:
+        color = color_dict[column]
         fig.add_traces(go.Scatter(x=dff['TIMESTAMP'], y = df[column], 
                     mode = 'lines', line=dict(color=color), name=column))
     # fig.update_xaxes(range = [tmin, tmax])
@@ -66,16 +62,33 @@ figure_24h = get_figure_24h(dff, selected_columns)
 
 def get_figure_energy_per_hour(df, selected_zone, selected_hour):
     print('In get_figure_energy_per_hour')
-    df_hour = df[selected_hour]
+    print('selected_zone', selected_zone)
+    print('selected_hour', selected_hour)
+    print('df.columns', df.columns)
+    if selected_zone is None or len(selected_zone)==0:
+        return
+    selected_zone = sorted(selected_zone, key=lambda x : x[-2:])
+    df_hour = df[selected_zone]
     df_hour = pd.DataFrame(df_hour.loc[selected_hour:selected_hour])
     cols = df_hour.columns
+    print('cols',cols)
     cols = [cc for cc in cols if cc.startswith('Zone')]
     dff = df_hour[cols]
     dff = dff.T
+    # dff.reset_index(inplace=True)
+    print('dff.head()\n',dff.head())
+    bars = []
     fig = go.Figure()
-    fig.add_traces( 
-        go.Bar(x=dff.index, y=dff[dff.columns[0]])
-    )
+    for zone in selected_zone:
+        color = color_dict[zone]
+        print('color', color)
+        print('zone', zone)
+        print('dff.loc[zone][dff.columns[-1]', dff.loc[zone][dff.columns[-1]])
+        fig.add_traces(
+            go.Bar(x=[zone], y=[dff.loc[zone][dff.columns[-1]]], 
+                marker={'color': color})
+        )
+    
     fig.update_yaxes(range = [0,1])
     fig.layout.template = 'plotly_white'
     return fig
@@ -85,8 +98,11 @@ def get_figure_energy_per_hour(df, selected_zone, selected_hour):
 # LAYOUT
 ################################################################################
 day='2013-01-01'
-df = make_prediction(day)
-df['HOUR'] = df['TIMESTAMP'].dt.hour
+filename = 'prediction_for_dasboard.csv'
+# df = make_prediction(day)
+# df['HOUR'] = df['TIMESTAMP'].dt.hour
+# df.to_csv(filename,index=False)
+df = pd.read_csv(filename)
 
 app.layout = html.Div(
         [
@@ -207,6 +223,9 @@ def update_graphs(selected_columns):
     Input('energy-per-hour-slider', 'value'))
 def update_figure(selected_zone, selected_hour):
     print('in update_figure')
+    print('selected_zone', selected_zone)
+    print('selected_hour', selected_hour)
+    
     return get_figure_energy_per_hour(df, selected_zone, selected_hour)
 
 
