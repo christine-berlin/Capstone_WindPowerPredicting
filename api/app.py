@@ -18,21 +18,15 @@ class Todo(db.Model):
 
 @app.route('/', methods=['GET','POST'])
 def predict():
-    if request.method == 'POST':
-        task_content = request.form['content']
-        zone = request.form['zone']
-        print('ZONE: ', zone)
-        X = task_content
-        predictions = make_prediction(X, zone=zone)
-
-        #predictions = dict(zip(range(0,24),make_prediction(X)))
-        #pred = make_prediction(X, zone)
-        #predictions = dict(zip(range(-1,24),pred))
-        print('PRED: ', predictions)
-        #print('making prediction for {}: {}'.format(task_content, predictions))
-        return render_template('index.html', predictions=predictions)
-    else:
-        return render_template('index.html', predictions=[])
+    return redirect("http://www.example.com")
+    # if request.method == 'POST':
+    #     task_content = request.form['content']
+    #     zone = request.form['zone']
+    #     X = task_content
+    #     predictions = make_prediction(X, zone=zone)
+    #     return render_template('index.html', predictions=predictions)
+    # else:
+        # return render_template('index.html', predictions=[])
 
 
 @app.route('/delete/<int:id>')
