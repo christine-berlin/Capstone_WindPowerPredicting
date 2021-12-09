@@ -1,11 +1,11 @@
 ZONE,BEST_PARAMS,CV,MODEL,FC,TESTSCORE,TRAINSCORE
-ZONE1,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.18601836334175495,LinearRegression,all,0.19120794558602533,0.17885830580365164
-ZONE2,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.152399448161037,LinearRegression,no_deg,0.1759369236749672,0.14389413300836223
-ZONE3,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.15977783093667203,LinearRegression,no_deg_norm,0.15565526649430142,0.1520135704263285
-ZONE4,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.18609506569427242,LinearRegression,no_deg_norm,0.17537654295750157,0.17682296600205152
-ZONE5,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.1904083041747079,LinearRegression,no_deg,0.1793720080441109,0.17926606963370473
-ZONE6,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.19290575016495795,LinearRegression,all,0.19378472400997473,0.18117755751017506
-ZONE7,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.14306883490943592,LinearRegression,all,0.1517517548409622,0.13518705548448778
-ZONE8,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.16786994475024758,LinearRegression,no_deg_norm,0.19758801905719794,0.1607785505180834
-ZONE9,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.17118217646060882,LinearRegression,no_comp_plus_100Norm,0.16489844981228158,0.16567671138231588
-ZONE10,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.2059933636201589,LinearRegression,all,0.21139375579028694,0.19867397063720627
+ZONE1,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.18602554700471885,LinearRegression,all,0.191158930403168,0.17884157174866983
+ZONE2,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.15240762605890776,LinearRegression,no_deg,0.17620434072030688,0.14387474693857094
+ZONE3,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.15977783093667203,LinearRegression,no_deg_norm,0.1551291353063796,0.1520135704263285
+ZONE4,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.18609506569427237,LinearRegression,no_deg_norm,0.17593141185517994,0.17682296600205155
+ZONE5,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.19040830417470772,LinearRegression,no_deg,0.17985295128634232,0.17926606963370476
+ZONE6,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.19290575016495798,LinearRegression,all,0.1936937129260007,0.181177557510175
+ZONE7,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.14306883490943587,LinearRegression,all,0.1518885394572369,0.13518705548448778
+ZONE8,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.1678699447502476,LinearRegression,no_deg_norm,0.19757679984837592,0.16077855051808343
+ZONE9,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.17118217646060888,LinearRegression,no_comp_plus_100Norm,0.16494743801599704,0.1656767113823159
+ZONE10,"{'copy_X': True, 'fit_intercept': True, 'n_jobs': None, 'normalize': 'deprecated', 'positive': False}",0.20599336362015902,LinearRegression,all,0.21146942810617464,0.1986739706372063

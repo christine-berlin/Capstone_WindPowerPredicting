@@ -178,8 +178,9 @@ def modelling_fc(data_train, data_test, feature_dict, model, scaler=None, print_
                 infotext_mlflow=None, save_model = True, perform_gridCV = True, param_grid = None, \
                     zone_params = None, n_jobs = -1):
 
-    nfits = len(data_train.ZONEID.unique()) * len(feature_dict.keys()) * np.prod([len(x) for x in param_grid.values()]) * 5
-    print(f'Total number of fits: {nfits}')
+    if type(param_grid) == dict:
+        nfits = len(data_train.ZONEID.unique()) * len(feature_dict.keys()) * np.prod([len(x) for x in param_grid.values()]) * 5
+        print(f'Total number of fits: {nfits}')
 
     df_results = pd.DataFrame()
 
