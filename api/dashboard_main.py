@@ -36,37 +36,46 @@ server = app.server
 colors = px.colors.qualitative.Plotly
 color_dict = {'Zone '+str(z): c for z,c in zip(range(1,11), colors)}
 
-def get_figure_24h(dff, selected_columns):
+def get_figure_24h(dff, selected_zone, selected_hour=0):
+    print(selected_zone)
+    print(selected_hour)
+    print('dff.columns',dff.columns)
     tmin, tmax = 0,24
-    if 'TIMESTAMP' in dff.columns:
-        tmin = dff['TIMESTAMP'].min()
-        tmax = dff['TIMESTAMP'].max()
+    if 'HOUR' in dff.columns:
+        tmin = dff['HOUR'].min()
+        tmax = dff['HOUR'].max()
     print('tmin, tmax',tmin,tmax)
 
     colors = px.colors.qualitative.Plotly
     fig = go.Figure()
-    selected_columns = sorted(selected_columns, key=lambda x : x[-2:])
-    for column in selected_columns:
+    selected_zone = sorted(selected_zone, key=lambda x : x[-2:])
+    for column in selected_zone:
         color = color_dict[column]
-        fig.add_traces(go.Scatter(x=dff['TIMESTAMP'], y = df[column], 
+        fig.add_traces(go.Scatter(x=dff['HOUR'], y = df[column], 
                     mode = 'lines', line=dict(color=color), name=column))
-    # fig.update_xaxes(range = [tmin, tmax])
+    fig.update_xaxes(range = [tmin, tmax])
     fig.update_yaxes(range = [0,1])
     fig.layout.template = 'plotly_white'
     fig.layout.showlegend = True
+    fig.add_shape(type="line",
+        x0=selected_hour, y0=0, x1=selected_hour, y1=1,
+        line=dict(
+            color="red",
+            width=1,
+            dash="dash",
+        )
+    )
     return fig
 
-dff = pd.DataFrame()
-selected_columns = []
-figure_24h = get_figure_24h(dff, selected_columns)
+# dff = pd.DataFrame()
+# selected_zone = []
+# figure_24h = get_figure_24h(dff, selected_zone)
 
 def get_figure_energy_per_hour(df, selected_zone, selected_hour):
     print('In get_figure_energy_per_hour')
     print('selected_zone', selected_zone)
     print('selected_hour', selected_hour)
     print('df.columns', df.columns)
-    if selected_zone is None or len(selected_zone)==0:
-        return
     selected_zone = sorted(selected_zone, key=lambda x : x[-2:])
     df_hour = df[selected_zone]
     df_hour = pd.DataFrame(df_hour.loc[selected_hour:selected_hour])
@@ -86,9 +95,9 @@ def get_figure_energy_per_hour(df, selected_zone, selected_hour):
         print('dff.loc[zone][dff.columns[-1]', dff.loc[zone][dff.columns[-1]])
         fig.add_traces(
             go.Bar(x=[zone], y=[dff.loc[zone][dff.columns[-1]]], 
-                marker={'color': color})
+                marker={'color': color}, showlegend=False)
         )
-    
+
     fig.update_yaxes(range = [0,1])
     fig.layout.template = 'plotly_white'
     return fig
@@ -98,7 +107,7 @@ def get_figure_energy_per_hour(df, selected_zone, selected_hour):
 # LAYOUT
 ################################################################################
 day='2013-01-01'
-filename = 'prediction_for_dasboard.csv'
+filename = 'api/prediction_for_dashboard.csv'
 # df = make_prediction(day)
 # df['HOUR'] = df['TIMESTAMP'].dt.hour
 # df.to_csv(filename,index=False)
@@ -158,33 +167,6 @@ app.layout = html.Div(
                     )
                 ],
                 className="row"
-            ),
-            html.Div(
-                [
-                    dash_table.DataTable(
-                        id='datatable-interactivity',
-                        columns=[
-                            {"name": i, 
-                            "id": i, 
-                            "deletable": False, 
-                            "selectable": True} for i in df.columns
-                        ],
-                        data=df.to_dict('records'),
-                        editable=True,
-                        filter_action="native",
-                        sort_action="native",
-                        sort_mode="multi",
-                        column_selectable="multi",
-                        row_selectable="single",
-                        row_deletable=False,
-                        selected_columns=[],
-                        selected_rows=[],
-                        page_action="native",
-                        page_current= 0,
-                        page_size= 24,
-                    )#,
-        #html.Div(id='datatable-interactivity-container')
-                ] 
             )
         ]
     )
@@ -207,14 +189,14 @@ def update_output(selected_columns):
 
 @app.callback(
     Output('plot-24h', "figure"),
-    Input('zone-selector', 'value')
-)
-def update_graphs(selected_columns):
-    cols = selected_columns.copy()
+    Input('zone-selector', 'value'),
+    Input('energy-per-hour-slider', 'value'))
+def update_graphs(selected_zone, selected_hour):
+    cols = selected_zone.copy()
     cols.append('TIMESTAMP')
-    dff = df[cols]
+    
 
-    return get_figure_24h(dff, selected_columns)
+    return get_figure_24h(df, selected_zone, selected_hour)
 
 
 @app.callback(
