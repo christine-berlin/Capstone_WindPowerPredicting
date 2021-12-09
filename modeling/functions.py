@@ -279,8 +279,7 @@ def predict_func(model, X, y):
     y_pred = model.predict(X)
     y_pred = pd.DataFrame([1 if value >= 1 else 0 if value <= 0 else value for value in y_pred], index = y.index, columns = ['pred'])
     return y_pred
-    y_trainpred = pd.concat([y_trainpred, y_pred], axis=0)
-    trainscore['ZONE' + str(zone)] = mean_squared_error(y_pred, y_train, squared=False)
+    
 
 
 def get_features(data):
