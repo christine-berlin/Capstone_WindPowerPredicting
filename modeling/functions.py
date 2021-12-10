@@ -1,7 +1,7 @@
 ## load modules
 import numpy as np
 import pandas as pd
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, make_scorer
 from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.base import clone
 import warnings
@@ -77,6 +77,10 @@ def log_to_mlflow(
 
     return None
 
+## 
+def adjusted_RMSE(y_test, y_pred):
+    y_pred = [1 if value >= 1 else 0 if value <= 0 else value for value in y_pred]
+    return mean_squared_error(y_test, y_pred, squared=False)
 
 ## function for modelling
 def modelling(data_train, data_test, features, model, scaler=None, print_scores=True, log=None, \
@@ -93,6 +97,9 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
 
     mse_train = 0
     mse_test = 0
+
+    scorer = make_scorer(adjusted_RMSE, greater_is_better=False)
+
     # loop over zones
     for zone in zones:
         model_clone = clone(model)
@@ -110,7 +117,7 @@ def modelling(data_train, data_test, features, model, scaler=None, print_scores=
         if perform_gridCV:
             if param_grid:
                 print(f'ZONEID {zone}')
-                cv = GridSearchCV(model_clone, param_grid= param_grid, scoring = 'neg_root_mean_squared_error', \
+                cv = GridSearchCV(model_clone, param_grid= param_grid, scoring = scorer, \
                                   refit=True, n_jobs=n_jobs, verbose=2)
                 cv.fit(X_train,y_train)
                 cv_score[zone] = np.abs(cv.best_score_)
