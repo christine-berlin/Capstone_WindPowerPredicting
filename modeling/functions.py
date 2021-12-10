@@ -237,24 +237,24 @@ def baseline(train, test):
 
     # get train and test data of individual zones
         ytrain = train[train.ZONEID == zone].TARGETVAR
-        ytest =  test[test.ZONEID == zone].TARGETVAR
+        #ytest =  test[test.ZONEID == zone].TARGETVAR
 
         # baseline predicton for individual zone
-        pred = np.ones(len(ytest)) * np.mean(ytrain)
+        pred = np.ones(len(ytrain)) * np.mean(ytrain)
 
         # RMSE for current zone
-        score['ZONE' + str(zone)] = mean_squared_error(ytest, pred, squared=False)
+        score['ZONE' + str(zone)] = mean_squared_error(ytrain, pred, squared=False)
 
         # add y_pred to DataFrame y_finalpred
-        pred = pd.DataFrame(pred, index = ytest.index, columns = ['pred'])
+        pred = pd.DataFrame(pred, index = ytrain.index, columns = ['pred'])
         finalpred = pd.concat([finalpred, pred], axis=0)
 
     # merge final baseline predictions with observations of all zones to ensure a right order in both data  
-    finalpred = finalpred.join(test.TARGETVAR)
-    finalpred.rename(columns = {'TARGETVAR':'test'}, inplace=True)
+    finalpred = finalpred.join(train.TARGETVAR)
+    finalpred.rename(columns = {'TARGETVAR':'train'}, inplace=True)
 
     # RMSE for whole dataset
-    score['TOTAL'] = mean_squared_error(finalpred['test'], finalpred['pred'], squared=False)
+    score['TOTAL'] = mean_squared_error(finalpred['train'], finalpred['pred'], squared=False)
     return score
 
 
