@@ -227,35 +227,35 @@ def baseline(train, test):
     zones = np.sort(train.ZONEID.unique()) 
 
     # baseline predictions of all sites will be merged into one DataFrame to calculate the RMSE with respect to the observations of all zones
-    finalpred = pd.DataFrame() 
-
-    # scores of zone-dependent baseline models are saved in dictionary
-    score = {}
+    #finalpred = pd.DataFrame() 
+    df_results = pd.DataFrame(index = [f'ZONE{zone}' for zone in zones] + ['TOTAL'], columns = ['BEST_PARAMS','CV','MODEL','FC','TESTSCORE','TRAINSCORE'])
+    df_results.loc['TOTAL'].TRAINSCORE = 0
+    df_results.loc['TOTAL'].TESTSCORE = 0
+    df_results['MODEL'] = 'Baseline'
 
     # loop over all zones
     for zone in zones:
 
-    # get train and test data of individual zones
+        # get train and test data of individual zones
         ytrain = train[train.ZONEID == zone].TARGETVAR
-        #ytest =  test[test.ZONEID == zone].TARGETVAR
+        ytest =  test[test.ZONEID == zone].TARGETVAR
 
         # baseline predicton for individual zone
-        pred = np.ones(len(ytrain)) * np.mean(ytrain)
+        pred_train = np.ones(len(ytrain)) * np.mean(ytrain)
+        pred_test = np.ones(len(ytest)) * np.mean(ytrain)
 
-        # RMSE for current zone
-        score['ZONE' + str(zone)] = mean_squared_error(ytrain, pred, squared=False)
+        df_results.loc[f'ZONE{zone}'].TRAINSCORE = mean_squared_error(ytrain, pred_train, squared=False)
+        df_results.loc[f'ZONE{zone}'].TESTSCORE = mean_squared_error(ytest, pred_test, squared=False)
 
-        # add y_pred to DataFrame y_finalpred
-        pred = pd.DataFrame(pred, index = ytrain.index, columns = ['pred'])
-        finalpred = pd.concat([finalpred, pred], axis=0)
+        df_results.loc['TOTAL'].TRAINSCORE += np.power(df_results.loc[f'ZONE{zone}'].TRAINSCORE,2) * len(ytrain)/len(train)
+        df_results.loc['TOTAL'].TESTSCORE += np.power(df_results.loc[f'ZONE{zone}'].TESTSCORE,2) * len(ytest)/len(test)
 
-    # merge final baseline predictions with observations of all zones to ensure a right order in both data  
-    finalpred = finalpred.join(train.TARGETVAR)
-    finalpred.rename(columns = {'TARGETVAR':'train'}, inplace=True)
+    df_results.loc['TOTAL'].TRAINSCORE = np.power(df_results.loc['TOTAL'].TRAINSCORE,.5)
+    df_results.loc['TOTAL'].TESTSCORE = np.power(df_results.loc['TOTAL'].TESTSCORE,.5)
 
-    # RMSE for whole dataset
-    score['TOTAL'] = mean_squared_error(finalpred['train'], finalpred['pred'], squared=False)
-    return score
+    df_results.index.set_names(['ZONE'], inplace=True)
+
+    return df_results
 
 
 def scaler_func(X_train, X_test, scaler):
