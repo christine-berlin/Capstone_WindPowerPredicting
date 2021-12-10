@@ -1,0 +1,3 @@
+[submodule "windpower_dashboard"]
+	path = windpower_dashboard
+	url = git@github.com:fklein21/windpower_dashboard.git
