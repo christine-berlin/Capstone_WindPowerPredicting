@@ -2,7 +2,7 @@
 - logging with MLflow,
 - modelling,
 - hyperparameter tuning,
-- choosing features, 
+- choosing features,
 - saving and loading models
 more convenient.
 """
@@ -34,26 +34,26 @@ def log_to_mlflow(
     """Logs to mlflow.
 
     Args:
-      ZONEID: int (Default value = None)
-      Model: string (Default value = None)
-      train: RMSE
-      test: RMSE
-      NaN: removed
-      Zero: removed
-      statistics: 
-      mean: int (Default value = None)
-      hyperparameter: dict (Default value = None)
-      model_parameters: dict (Default value = None)
-      features:  (Default value = None)
-      train_RMSE:  (Default value = None)
-      test_RMSE:  (Default value = None)
-      nan_removed:  (Default value = False)
-      zero_removed:  (Default value = False)
-      scaler:  (Default value = None)
-      info:  (Default value = None)
+      ZONEID (int): Zone number. (Default value = None)
+      Model (str): Name of model. (Default value = None)
+      features (list): List of features used. (Default value = None)
+      train_RMSE (float): RMSE score of train data set. (Default value = None)
+      test_RMSE (float): RMSE score of test data set. (Default value = None)
+      nan_removed (bool): True if NaN values are removed from initial data set.
+                          (Default value = False)
+      zero_removed (bool): True if zero values are removed
+                           from initial data set. (Default value = False)
+      mean (int): Mean of the scores. (Default value = None)
+      hyperparameter (dict): Dictionary of the hyperparameters.
+                             (Default value = None)
+      model_parameters (dict): Dictionary with the model parameters.
+                               (Default value = None)
+      scaler (sklearn.scaler): Scaler that was applied to the data.
+                               (Default value = None)
+      info (str): Additional info. (Default value = None)
 
     Returns:
-
+      None
     """
 
     mlflow.set_tracking_uri(TRACKING_URI)
@@ -71,7 +71,7 @@ def log_to_mlflow(
 
     mlflow.start_run()
     run = mlflow.active_run()
-    print("\nActive run_id: {}".format(run.info.run_id))
+    print(f"\nActive run_id: {run.info.run_id}")
 
     if ZONEID:
         mlflow.set_tag("ZONEID", ZONEID)
@@ -95,11 +95,9 @@ def log_to_mlflow(
 
     mlflow.end_run()
 
-    return None
-
 
 def adjusted_RMSE(y_test, y_pred):
-    """Computes the RMSE after the values in y_pred have been adjusted to the 
+    """Computes the RMSE after the values in y_pred have been adjusted to the
     interval [0, 1].
 
     Args:
@@ -108,7 +106,7 @@ def adjusted_RMSE(y_test, y_pred):
                             prediction of the targer variable.
 
     Returns:
-      float: The adjusted RMSE between y_test and y_pred. 
+      float: The adjusted RMSE between y_test and y_pred.
 
     """
     y_pred = [1 if value >= 1 else 0 if value <= 0 else value
@@ -122,24 +120,33 @@ def modelling(data_train, data_test, features, model,
               infotext_mlflow=None, save_model=True,
               perform_gridCV=True, param_grid=None,
               zone_params=None, n_jobs=-1):
-    """
+    """Fits the model to each zone, optionally performs a grid search
+    and saves the result.
 
     Args:
-      data_train: 
-      data_test: 
-      features: 
-      model: 
-      scaler:  (Default value = None)
-      print_scores:  (Default value = True)
-      log:  (Default value = None)
-      infotext_mlflow:  (Default value = None)
-      save_model:  (Default value = True)
-      perform_gridCV:  (Default value = True)
-      param_grid:  (Default value = None)
-      zone_params:  (Default value = None)
-      n_jobs:  (Default value = -1)
+      data_train (pd.DataFrame):
+      data_test (pd.DataFrame):
+      features (list): List with the features to use.
+      model (sklearn.model): Model to fit or perform gridsearch on.
+      scaler (sklearn.scaler): Optional scaler to apply. (Default value = None)
+      print_scores (bool): If true, prints scores. (Default value = True)
+      log (bool): If true, logs to MLflow. (Default value = None)
+      infotext_mlflow (str): Optional text for MLflow. (Default value = None)
+      save_model (bool): If true, best model is saved. (Default value = True)
+      perform_gridCV (bool): If true, a grid search is performed.
+                             (Default value = True)
+      param_grid (dict): A dictionary with the parameter grid.
+                         (Default value = None)
+      zone_params (list): Optional parameters for a zone.
+                          (Default value = None)
+      n_jobs (int): Number of cores to use. (Default value = -1)
 
     Returns:
+      trainscore (np.array): Train score for each zone.
+      testscore (np.array): Test score for each zone.
+      model_dict (dict): Dictionary with the fitted models.
+                         (Only if save_model is True.)
+      cv_score (np.array): Score from the cross validation.
 
     """
     # Get zones in data.
@@ -271,21 +278,24 @@ def modelling_fc(data_train, data_test, feature_dict, model, scaler=None,
       data_test (pd.Dataframe): Contains the data from the test data set.
       feature_dict (dict): Dictionary with the feature combination.
       model (sklearn.model): Model which hyperparameters are to be tuned.
-      scaler (sklearn.Scaler):  (Default value = None) Scaler to be applied.
-      print_scores (bool):  (Default value = True) Print scores?
-      log (bool):  (Default value = None) Log to MLflow?
-      infotext_mlflow ():  (Default value = None)
-      save_model:  (Default value = True)
-      perform_gridCV:  (Default value = True)
-      param_grid:  (Default value = None)
-      zone_params:  (Default value = None)
-      n_jobs:  (Default value = -1)
+      scaler (sklearn.Scaler): Scaler to be applied. (Default value = None)
+      print_scores (bool): Print scores? (Default value = True)
+      log (bool): Log to MLflow? (Default value = None)
+      infotext_mlflow (str): Optional string for logging to MLflow.
+                             (Default value = None)
+      save_model (bool): If true, the model is saved. (Default value = True)
+      perform_gridCV (bool): If true, grid search is performed.
+                             (Default value = True)
+      param_grid (dict): (Default value = None) Parameters for grid search.
+      zone_params (list): Optional parameters for each zone.
+                          (Default value = None)
+      n_jobs (int): Number of threads to use. (Default value = -1)
 
     Returns:
-
+      (pd.DataFrame): Dataframe with results of the hyperparameter tuning.
     """
 
-    if type(param_grid) == dict:
+    if param_grid.isinstanceof(dict):
         nfits = len(data_train.ZONEID.unique()) * len(feature_dict.keys()) \
                     * np.prod([len(x) for x in param_grid.values()]) * 5
         print(f'Total number of fits: {nfits}')
@@ -308,58 +318,62 @@ def modelling_fc(data_train, data_test, feature_dict, model, scaler=None,
 
     return df_results
 
+
 def result_to_df(model_dict, testscore, trainscore, cv_score, fc):
-    """
+    """Stores the results of the modelling as a Pandas Dataframe.
 
     Args:
-      model_dict: 
-      testscore: 
-      trainscore: 
-      cv_score: 
-      fc: 
+      model_dict (dict): Dictionary with the models.
+      testscore (dict): Dictionary with the scores of the test data.
+      trainscore (dict): Dictionary with the scores of the train data.
+      cv_score (list): List with the score of the cross-validation.
+      fc (list): List with the features used in the fitting.
 
     Returns:
-
+      (pd.DataFrame): Dataframe with results.
     """
     df_results = pd.DataFrame(pd.Series([model_dict[i].get_params()
-                                         for i in range(1,11)]),
-                                         columns = ['BEST_PARAMS'])
+                                        for i in range(1, 11)]),
+                                        columns=['BEST_PARAMS'])
     df_results['CV'] = pd.Series([cv_score[i] for i in range(1,11)])
     df_results['ZONE'] = df_results.index
     df_results.ZONE = df_results.ZONE.apply(lambda x: f'ZONE{x+1}')
     df_results = df_results.set_index('ZONE')
     df_results['MODEL'] = model_dict[1].__class__.__name__
     df_results['FC'] = fc
-    df_results = df_results.join(pd.DataFrame.from_dict(testscore,
-                                                        orient='index',
-                                                        columns=['TESTSCORE'])) # leave out TOTAL
-    df_results = df_results.join(pd.DataFrame.from_dict(trainscore,
-                                                        orient='index',
-                                                        columns=['TRAINSCORE']))
+    df_results = df_results.join(pd.DataFrame.from_dict(
+                                    testscore,
+                                    orient='index',
+                                    columns=['TESTSCORE'])) # leave out TOTAL
+    df_results = df_results.join(pd.DataFrame.from_dict(
+                                    trainscore,
+                                    orient='index',
+                                    columns=['TRAINSCORE']))
     return df_results
 
 
-## baseline model for every zone and aggregated over all zones
 def baseline(train, test):
-    """baseline model for every zone and aggregated over all zones
+    """Returns the score of the baseline model
+    for every zone and aggregated over all zones.
 
     Args:
-      train: 
-      test: 
+      train (pd.DataFrame): Train data set (features and target).
+      test (pd.DataFrame): Test data set (features and target).
 
     Returns:
+      (pd.DataFrame): Dataframe with the scores for train and test set.
 
     """
 
     # zones to loop over
     zones = np.sort(train.ZONEID.unique())
-
-    # baseline predictions of all sites will be merged into one DataFrame to calculate the RMSE with respect to the observations of all zones
-    #finalpred = pd.DataFrame()
+    # baseline predictions of all sites will be merged into one DataFrame 
+    # to calculate the RMSE with respect to the observations of all zones
+    # finalpred = pd.DataFrame()
     df_results = pd.DataFrame(
                         index=[f'ZONE{zone}' for zone in zones] + ['TOTAL'],
-                        columns = ['BEST_PARAMS','CV','MODEL','FC',
-                                   'TESTSCORE','TRAINSCORE'])
+                        columns=['BEST_PARAMS', 'CV', 'MODEL', 'FC',
+                                 'TESTSCORE', 'TRAINSCORE'])
     df_results.loc['TOTAL'].TRAINSCORE = 0
     df_results.loc['TOTAL'].TESTSCORE = 0
     df_results['MODEL'] = 'Baseline'
@@ -388,9 +402,9 @@ def baseline(train, test):
                 * len(ytest)/len(test)
 
     df_results.loc['TOTAL'].TRAINSCORE = np.power(
-                                        df_results.loc['TOTAL'].TRAINSCORE,.5)
+                                    df_results.loc['TOTAL'].TRAINSCORE, .5)
     df_results.loc['TOTAL'].TESTSCORE = np.power(
-                                        df_results.loc['TOTAL'].TESTSCORE,.5)
+                                    df_results.loc['TOTAL'].TESTSCORE, .5)
 
     df_results.index.set_names(['ZONE'], inplace=True)
 
@@ -398,14 +412,16 @@ def baseline(train, test):
 
 
 def scaler_func(X_train, X_test, scaler):
-    """
+    """Scales the train and test data with the provided scaler.
 
     Args:
-      X_train: 
-      X_test: 
-      scaler: 
+      X_train (pd.DataFrame): Dataframe with the train data.
+      X_test (pd.DataFrame): Dataframe with the test data.
+      scaler (sklearn.Scaler): The (unfitted) scaler.
 
     Returns:
+      (sklearn.Scaler): Scaled train data.
+      (sklearn.Scaler): Scaled test data.
 
     """
     X_train = scaler.fit_transform(X_train)
@@ -427,16 +443,22 @@ def scaler_func(X_train, X_test, scaler):
 
     return X_train, X_test
 
+
 def train_test_feat(data_train, data_test, zone, features):
-    """
+    """Returns a pd.DataFrame with the explanatory variables and
+    a pd.Series with the targetvariable, for both train and test data.
 
     Args:
-      data_train: 
-      data_test: 
-      zone: 
-      features: 
+      data_train (pd.DataFrame): Train data set.
+      data_tes (pd.DataFrame): Test data set.
+      zone (int): The zone id (id of the wind farm).
+      features (list): A list of the column names to be used.
 
     Returns:
+      (pd.DataFrame): Explanatory variables of train data set.
+      (pd.Series): Target variable fo train data set.
+      (pd.DataFrame): Explanatory variables of test data set.
+      (pd.Series): Target variable fo test data set.
 
     """
     X_train = data_train[data_train.ZONEID == zone][features]
@@ -448,7 +470,7 @@ def train_test_feat(data_train, data_test, zone, features):
 
 
 def predict_func(model, X, y):
-    """Predicts using a given model 
+    """Predicts using a given model
     and adjusts the result in the interval [0,1].
 
     Args:
@@ -463,13 +485,12 @@ def predict_func(model, X, y):
     y_pred = model.predict(X)
     y_pred = pd.DataFrame(
         [1 if value >= 1 else 0 if value <= 0 else value for value in y_pred],
-        index = y.index, columns = ['pred'])
+        index=y.index, columns=['pred'])
     return y_pred
 
 
-
 def get_features(data):
-    """Returns a dictionary with different feature combinations 
+    """Returns a dictionary with different feature combinations
     of the dataframe.
 
     Args:
@@ -482,27 +503,29 @@ def get_features(data):
     """
     features = data.columns.to_list()
     features = [var for var in features
-                if var not in ('ZONEID','TARGETVAR','TIMESTAMP')]
+                if var not in ('ZONEID', 'TARGETVAR', 'TIMESTAMP')]
 
     feature_dict = {}
 
     feature_dict['all'] = features
     feature_dict['no_deg'] = [var for var in features
-            if var not in ('WD100','WD10')]
+            if var not in ('WD100', 'WD10')]
     feature_dict['no_deg_norm'] = [var for var in features
-            if var not in ('WD100','WD10','U100NORM','V100NORM')]
+            if var not in ('WD100', 'WD10', 'U100NORM', 'V100NORM')]
     feature_dict['no_comp'] = [var for var in features
-            if var not in ('U10','U100','U100NORM','V10','V100','V100NORM')]
+            if var not in ('U10', 'U100', 'U100NORM',
+                           'V10', 'V100', 'V100NORM')]
     feature_dict['no_comp_plus_100Norm'] = [var for var in features
-            if var not in ('U10','U100','V10','V100')]
+            if var not in ('U10', 'U100', 'V10', 'V100')]
     feature_dict['no_ten'] = [var for var in features
             if 'WD10CARD' not in var
-            and var not in ('U10','V10','WS10','WD10')]
+            and var not in ('U10', 'V10', 'WS10', 'WD10')]
     feature_dict['no_card'] = [var for var in features if 'CARD' not in var]
     feature_dict['no_card_100Norm'] = [var for var in features
-            if 'CARD' not in var and var not in ('U100NORM','V100NORM')]
+            if 'CARD' not in var and var not in ('U100NORM', 'V100NORM')]
 
     return feature_dict
+
 
 def save_models(model_dict, model_name=None,
                 results_train=None, results_test=None):
@@ -511,9 +534,9 @@ def save_models(model_dict, model_name=None,
     Args:
       model_dict (dict): Dictionary with the models.
       model_name (str):  (Default value = None) Model name.
-      results_train (dict):  (Default value = None) Scores for the 
+      results_train (dict):  (Default value = None) Scores for the
                              training data set.
-      results_test (dict):  (Default value = None) Scores for the 
+      results_test (dict):  (Default value = None) Scores for the
                             test data set.
 
     Returns:
@@ -538,7 +561,7 @@ def save_models(model_dict, model_name=None,
     for feat in model_dict.keys():
         dir2 = path+'/'+feat
         os.mkdir(dir2)
-        for zone,model in model_dict[feat].items():
+        for zone, model in model_dict[feat].items():
             filename = 'zone_'+str(zone).zfill(2)+'.pickle'
             with open(dir2+'/'+filename, 'wb') as outfile:
                 pickle.dump(model, outfile)
@@ -561,11 +584,11 @@ def load_models(parent_dir):
     for feat in os.listdir(path):
         model_dict[feat] = {}
         for zone in os.listdir(path+'/'+feat):
-            if len(zone.split('.'))>1:
+            if len(zone.split('.')) > 1:
                 pass
             else:
                 filename = path+'/'+feat+'/'+zone
-                with open(filename,'rb') as infile:
+                with open(filename, 'rb') as infile:
                     loaded = pickle.load(infile)
                     infile.close()
                     model_dict[feat][int(zone.split('.')[0][-2:])] = loaded
@@ -596,7 +619,7 @@ def save_results(results_train, results_test, path):
             train_score.append(results_train[key][zone])
             test_score.append(results_test[key][zone])
 
-    df = pd.DataFrame({'features':features,'zone': zones,\
-                       'train_score': train_score,'test_score': test_score})
+    df = pd.DataFrame({'features':features, 'zone': zones,
+                       'train_score': train_score, 'test_score': test_score})
     file_name = path.split('/')[-1] + '.csv'
     df.to_csv(path + '/' + file_name, index=False)
