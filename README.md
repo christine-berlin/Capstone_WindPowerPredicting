@@ -10,6 +10,7 @@ We built several machine learning models in Python, to find our best model. This
 
 
 The slides of our presentation: [slides](Capstone_WindPowerPrediciting.pdf)
+[video](https://www.youtube.com/watch?v=NEy4wG9iWeU&t=2s)
 
 The project has several notebooks: <br>
 - EDA (see [here](notebooks/1_EDA.ipynb)) 
