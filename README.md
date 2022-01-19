@@ -23,7 +23,7 @@ Link to the dashbaord on Heroku: \
 [Energy Output Forecast for the Next 24 Hours](https://windpower-forecast.herokuapp.com)
 
 Dashboard Repository: \
-[https://github.com/fklein21/windpower_dashboard](https://github.com/christine-berlin/windpower_dashboard)
+[https://github.com/christine-berlin/windpower_dashboard](https://github.com/christine-berlin/windpower_dashboard)
 
 ## Data
 The Data is from the 2014 Global Energy Forecasting Competition, and consists of
