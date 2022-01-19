@@ -9,7 +9,7 @@ In this capstone we worked in a group of 4 people. The goal was to predict the w
 We built several machine learning models in Python, to find our best model. This included extensive explanatory data analysis, feature engineering as well as finding an appropriate metric. We developed a dashboard to visualize the results of our final model and deployed it on Heroku.
 
 
-The slides of our presentation: [slides](Capstone_WindPowerPrediciting.pdf)
+The slides of our presentation: [slides](presentation.pdf)
 [video](https://www.youtube.com/watch?v=NEy4wG9iWeU&t=2s)
 
 The project has several notebooks: <br>
