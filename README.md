@@ -27,6 +27,7 @@ Dashboard Repository: \
 
 ## Data
 The Data is from the 2014 Global Energy Forecasting Competition. <br>
+Weather forecaste, given as u and v components (zonal and meridional).
 ~ 18k data rows per wind farm
 
 
