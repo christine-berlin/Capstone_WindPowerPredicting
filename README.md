@@ -6,7 +6,7 @@ Team "Voltcasters": Christine, Ferdinand, Moritz, Jerome
 ## About
 Forecasting the wind energy production will grow in importance as wind energy is one of the fast-growing renewable energy sources in the world.
 In this capstone we worked in a group of 4 people. The goal was to predict the wind energy generation 24 h ahead with an hourly resolution, for 10 wind farms located in Australia, based on wind forecasts. 
-We built several machine learning models in Python, to find our best model. This included extensive explanatory data analysis, feature engineering as well as finding an appropriate metric. We developed a dashboard to visualize the results of our final model.
+We built several machine learning models in Python, to find our best model. This included extensive explanatory data analysis, feature engineering as well as finding an appropriate metric. We developed a dashboard to visualize the results of our final model and deployed it on Heroku.
 
 
 The slides of our presentation: [slides](Capstone_WindPowerPrediciting.pdf)
@@ -19,7 +19,7 @@ The project has several notebooks: <br>
 - The error analysis is done in [here](notebooks/4_Error_Analysis_all_models.ipynb) and [here](notebooks/4_Error_Analysis_Random_Forest.ipynb)
 
 ## Dashboard
-We developed a dashboard to visualize our results and deployed it to Heroku: \
+Link to the dashbaord on Heroku: \
 [Energy Output Forecast for the Next 24 Hours](https://windpower-forecast.herokuapp.com)
 
 Dashboard Repository: \
