@@ -33,6 +33,11 @@ The forecasts were given at two heights, 10m amd 100m above grond level.
 
 
 ## Environment
+make setup
+
+#or
+
+
 ```
 pyenv local 3.9.4
 python -m venv .venv
