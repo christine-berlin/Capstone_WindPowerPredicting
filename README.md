@@ -27,7 +27,8 @@ Dashboard Repository: \
 
 ## Data
 The Data is from the 2014 Global Energy Forecasting Competition, and consists of
-weather forecasts, given as u and v components (zonal and meridional), which we transformed to wind speed and direction.
+weather forecasts, given as u and v components (zonal wind, flowing in west-east direction, and meridional wind, flowing in north-south direction), 
+which we transformed to wind speed and direction.
 The forecasts were given at two heights, 10m amd 100m above grond level.
 ~ 18k data rows per wind farm.
 
