@@ -18,6 +18,8 @@ The project has several notebooks: <br>
 - The models we used (see [here](notebooks/3_Modeling.ipynb)) 
 - The error analysis is done in [here](notebooks/4_Error_Analysis_all_models.ipynb) and [here](notebooks/4_Error_Analysis_Random_Forest.ipynb)
 
+Python script for model training, making predictions, logging to MLflow, saving and loading the models : [script](modelling/functions.py) 
+
 ## Dashboard
 Link to the dashbaord on Heroku: \
 [Energy Output Forecast for the Next 24 Hours](https://windpower-forecast.herokuapp.com)
