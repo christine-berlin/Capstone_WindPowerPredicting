@@ -15,7 +15,7 @@ The slides of our presentation: [slides](presentation.pdf)
 The project has several notebooks: <br>
 - EDA (see [here](notebooks/1_EDA.ipynb)) 
 - The baseline model (see [here](notebooks/2_Baseline.ipynb)) 
-- The models we used (see [here](notebooks/3_Modelling.ipynb)) 
+- The models we used (see [here](notebooks/3_Modeling.ipynb)) 
 - The error analysis is done in [here](notebooks/4_Error_Analysis_all_models.ipynb) and [here](notebooks/4_Error_Analysis_Random_Forest.ipynb)
 
 ## Dashboard
