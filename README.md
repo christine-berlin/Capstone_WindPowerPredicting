@@ -21,12 +21,18 @@ The slides of our presentation: [slides](presentation.pdf)
     - Analysing effects of windspeed and winddirection on the target [part4](notebooks/2_4_EDA_Wind.ipynb)
  3. Feature engineering [here](notebooks/2_5_Feature_engineering.ipynb)
  4. The baseline model [here](notebooks/3_Baseline.ipynb)
- 5. The models we used [here](notebooks/4_Modeling.ipynb)
+ 5. Modeling [here](notebooks/4_Modeling.ipynb)
+    - Training 7 models 
+    - logging to MLflow
+    - saving the scores, the best feature combinations, and the results from hyperparameter tuning for every model in 
+    csv files 
+    
  6. With our best model we made the predictions of the target [here](notebooks/5_Target.ipynb)
- 7. Error analysis [part1](notebooks/6_Error_Analysis_all_models.ipynb), 
- [part2](notebooks/6_Error_Analysis_Random_Forest.ipynb)
+ 7. Error analysis [here](notebooks/6_Error_Analysis.ipynb)
 
-Python script for model training, making predictions, writing scores and best feature combinations to .csv files, logging to MLflow : [script](modeling/functions.py) 
+ 8.  Python scripts with functions needed for training the models, making predictions, logging to MLflow 
+[features](modeling/features.py) and [functions](modeling/functions.py)
+
 
 ## Dashboard
 Link to the dashbaord on Heroku: \
