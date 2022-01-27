@@ -21,7 +21,7 @@ The slides of our presentation: [slides](presentation.pdf)
  2. Then second part is data cleaning and EDA 
     - Data cleaning and histograms [part1](notebooks/2_1_EDA_Data_Cleaning.ipynb), 
     - Inspecting the Zero Values of the target [part2](notebooks/2_2_EDA_Zero_Values.ipynb),
-    - Analysing feature behavior over time [part3](notebooks/EDA_2_3_Time_Analysis.ipynb)
+    - Analysing feature behavior over time [part3](notebooks/2_3_EDA_Time_Analysis.ipynb)
     - Analysing effects of windspeed and winddirection on the target [part4](notebooks/2_4_EDA_Wind.ipynb)
  3. Feature correlations [here](notebooks/2_5_Feature_Correlations.ipynb)
  4. The baseline model [here](notebooks/3_Baseline.ipynb)
