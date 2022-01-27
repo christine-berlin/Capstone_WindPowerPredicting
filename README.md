@@ -17,9 +17,9 @@ The slides of our presentation: [slides](presentation.pdf)
 [video](https://www.youtube.com/watch?v=NEy4wG9iWeU&t=2s)
 
 ## Contents: 
- 1. In the first notebook we define the dataset and added more features [here](notebooks/1_Dataset.ipynb)
+ 1. In the first notebook we define the dataset and add more features [here](notebooks/1_Dataset.ipynb)
  2. Then second part is data cleaning and EDA 
-    - Data cleaning and histograms [part1](notebooks/2_1_EDA_Data_cleaning.ipynb), 
+    - Data cleaning and histograms [part1](notebooks/2_1_EDA_Data_Cleaning.ipynb), 
     - Inspecting the Zero Values of the target [part2](notebooks/2_2_EDA_Zero_Values.ipynb),
     - Analysing feature behavior over time [part3](notebooks/2_3_Time_Analysis_EDA.ipynb)
     - Analysing effects of windspeed and winddirection on the target [part4](notebooks/2_4_EDA_Wind.ipynb)
@@ -32,9 +32,10 @@ The slides of our presentation: [slides](presentation.pdf)
     csv files 
  6. Feature importance [here](notebooks/5_Feature_Importance.ipynb)  
  7. With our best model we make the predictions of the target [here](notebooks/6_Target.ipynb)
- 8. Error analysis [here](notebooks/7_Error_Analysis.ipynb)
+9. Performance of our model [here](notebooks/7_Performance.ipynb)
+ 9. Error analysis [here](notebooks/8_Error_Analysis.ipynb)
 
- 9.  Python scripts with functions needed for training the models, making predictions, logging to MLflow: <br> 
+ 10.  Python scripts with functions needed for training the models, making predictions, logging to MLflow: <br> 
 [features](modeling/features.py) and [functions](modeling/functions.py)
 
 
