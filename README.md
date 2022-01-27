@@ -3,6 +3,10 @@
 
 Team "Voltcasters": Christine, Ferdinand, Moritz, Jerome
 
+
+![plot](/images/windfarm.png)
+
+
 ## About
 Forecasting the wind energy production will grow in importance as wind energy is one of the fast-growing renewable energy sources in the world.
 In this capstone we worked in a group of 4 people. The goal was to predict the wind energy generation 24 h ahead with an hourly resolution, for 10 wind farms located in Australia, based on wind forecasts. 
