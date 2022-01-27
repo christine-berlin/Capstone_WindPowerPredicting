@@ -23,19 +23,19 @@ The slides of our presentation: [slides](presentation.pdf)
     - Inspecting the Zero Values of the target [part2](notebooks/2_2_EDA_Zero_Values.ipynb),
     - Analysing feature behavior over time [part3](notebooks/2_3_EDA_Time_Analysis.ipynb)
     - Analysing effects of windspeed and winddirection on the target [part4](notebooks/2_4_EDA_Wind.ipynb)
- 3. Feature correlations [here](notebooks/2_5_Feature_Correlations.ipynb)
- 4. The baseline model [here](notebooks/3_Baseline.ipynb)
- 5. Modeling [here](notebooks/4_Modeling.ipynb)
+   - 2.1 Feature correlations [here](notebooks/2_5_Feature_Correlations.ipynb)
+ 3. The baseline model [here](notebooks/3_Baseline.ipynb)
+ 4. Modeling [here](notebooks/4_Modeling.ipynb)
     - Training 7 models 
     - logging to MLflow
     - saving the scores, the best feature combinations, and the results from hyperparameter tuning for every model in 
     csv files 
- 6. Feature importance [here](notebooks/5_Feature_Importance.ipynb)  
- 7. With our best model we make the predictions of the target [here](notebooks/6_Target.ipynb)
- 8. Performance of our model [here](notebooks/7_Performance.ipynb)
- 9. Error analysis [here](notebooks/8_Error_Analysis.ipynb)
+ 5. Feature importance [here](notebooks/5_Feature_Importance.ipynb)  
+ 6. With our best model we make the predictions of the target [here](notebooks/6_Target.ipynb)
+ 7. Performance of our model [here](notebooks/7_Performance.ipynb)
+ 8. Error analysis [here](notebooks/8_Error_Analysis.ipynb)
 
- 10.  Python scripts with functions needed for training the models, making predictions, logging to MLflow: <br> 
+ 9.  Python scripts with functions needed for training the models, making predictions, logging to MLflow: <br> 
 [features](modeling/features.py) and [functions](modeling/functions.py)
 
 
