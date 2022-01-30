@@ -25,11 +25,12 @@ The slides of our presentation: [slides](presentation.pdf)
     - Analysing effects of windspeed and winddirection on the target [part4](notebooks/2_4_EDA_Wind.ipynb)
    - 2.1 Feature correlations [here](notebooks/2_5_Feature_Correlations.ipynb)
  3. The baseline model [here](notebooks/3_Baseline.ipynb)
- 4. Modeling [here](notebooks/4_Modeling.ipynb)
+ 4. Modeling [here](notebooks/4_1_Modeling.ipynb)
     - Training 7 models 
     - logging to MLflow
     - saving the scores, the best feature combinations, and the results from hyperparameter tuning for every model in 
     csv files 
+    - Saving the models with Pickle [here](notebooks/4_2_Saving_Models.ipynb)
  5. Feature importance [here](notebooks/5_Feature_Importance.ipynb)  
  6. With our best model we make the predictions of the target [here](notebooks/6_Target.ipynb)
  7. Performance of our model [here](notebooks/7_Performance.ipynb)
