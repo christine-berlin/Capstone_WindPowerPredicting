@@ -11,9 +11,7 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import GridSearchCV
 import mlflow
-
 from modeling.config import EXPERIMENT_NAME
-
 TRACKING_URI = open("../.mlflow_uri").read().strip()
 warnings.filterwarnings('ignore')
 
@@ -94,6 +92,7 @@ def adjusted_RMSE(y_test, y_pred):
 def get_bestfeatures(df):
 
     """Get the best feature combination for a model and for each zone.
+       Best means, best result in CV.
 
     Args:
       df (pd.DataFrame): Contains the test/train-score for one model,
@@ -197,11 +196,13 @@ def train_test_split_features(data_train, data_test, zone, features):
 def predict_func(model, X, y):
     """Predicts using a given model
     and adjusts the result in the interval [0,1].
+    Predictions can't have values larger than 1 or smaller than 0, because the energy output 
+    consists of nornmalized values in [0,1].
 
     Args:
       model (sklearn.model): Model which to use for predicting.
       X (pd.DataFrame): Dataframe with explanatory variables.
-      y (np.array): Result of the prediction.
+      y (pd:Series) : Target variable of test data
 
     Returns:
       (np.array): Adjusted result of the prediction.
